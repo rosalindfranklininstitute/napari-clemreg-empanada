@@ -18,7 +18,7 @@ ARG TUF_VERSION="v0.7.0" # https://pkg.go.dev/github.com/theupdateframework/go-t
 ARG COSIGN_VERSION="v2.5.0" # https://github.com/sigstore/cosign/releases
 
 # Python Requirements from (https://devguide.python.org/getting-started/setup-building/#install-dependencies)
-ARG PYTHON_VERSION="3.9.21" # https://github.com/krentzd/napari-clemreg requires python3.9
+ARG PYTHON_VERSION="3.9.21" # https://pypi.org/project/empanada-napari/ requires python3.9
 ARG BUILD_ESSENTIAL_VERSION="12.10ubuntu1" # https://packages.ubuntu.com/noble/build-essential
 ARG GDB_VERSION="15.0.50.20240403-0ubuntu1" # https://packages.ubuntu.com/noble/gdb
 ARG LCOV_VERSION="2.0-4ubuntu2" # https://packages.ubuntu.com/noble/lcov
@@ -45,10 +45,12 @@ ARG UUID_DEV_VERSION="2.39.3-9ubuntu6.2" # https://packages.ubuntu.com/noble-upd
 ARG ZLIB1G_DEV_VERSION="1:1.3.dfsg-3.1ubuntu2.1" # https://packages.ubuntu.com/noble-updates/zlib1g-dev
 ARG LIBZSTD_DEV_VERSION="1.5.5+dfsg2-2build1.1" # https://packages.ubuntu.com/noble-updates/libzstd-dev
 
-ARG PIP_VERSION="25.1.1"
-ARG NAPARI_VERSION="0.4.18"
-ARG CLEMREG_VERSION="0.2.1"
-ARG EMPANADA_VERSION="1.1.1"
+#Python Requirments
+ARG PIP_VERSION="25.1.1" # https://pypi.org/project/pip/
+ARG EMPANADA_VERSION="1.2" # https://pypi.org/project/empanada-napari/
+ARG NAPARI_VERSION="0.4.18" # https://empanada.readthedocs.io/en/latest/index.html 
+ARG CLEMREG_VERSION="0.2.1" # https://pypi.org/project/napari-clemreg/ 
+
 
 # NAPARI Requirements from: https://github.com/napari/napari/blob/v0.4.18x/dockerfile
 ARG MESA_UTILS_VERSION="9.0.0-2" # https://packages.ubuntu.com/noble/mesa-utils
@@ -90,7 +92,6 @@ RUN update-ca-certificates
 
 ARG GOBIN=/usr/bin/
 # Steps From https://docs.sigstore.dev/cosign/system_config/installation/#downloading-the-update-framework-tuf-client
-# Lates
 RUN go install github.com/theupdateframework/go-tuf/cmd/tuf-client@${TUF_VERSION} \
     && curl -o sigstore-root.json "https://raw.githubusercontent.com/sigstore/root-signing/refs/heads/main/metadata/root_history/10.root.json" \
     && tuf-client init "https://tuf-repo-cdn.sigstore.dev" sigstore-root.json \
