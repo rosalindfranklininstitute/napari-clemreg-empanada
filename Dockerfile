@@ -86,9 +86,8 @@ RUN apt-get -y update && apt-get install -y --no-install-recommends \
     golang-go=${GOLANG_GO_VERSION} \
     # Clean up and remove cache to reduce the image size.
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN update-ca-certificates
+    && rm -rf /var/lib/apt/lists/* \
+    && update-ca-certificates
 
 ARG GOBIN=/usr/bin/
 # Steps From https://docs.sigstore.dev/cosign/system_config/installation/#downloading-the-update-framework-tuf-client
@@ -101,9 +100,9 @@ RUN go install github.com/theupdateframework/go-tuf/cmd/tuf-client@${TUF_VERSION
     && curl -o cosign -L "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign-linux-amd64" \
     && openssl dgst -sha256 -verify artifact.pub -signature cosign-release.sig.decoded cosign \
     && rm cosign-release.sig.decoded cosign-release.sig artifact.pub sigstore-root.json \ 
-    && rm -rf tuf.db
-# make cosign exucatble and move to binary PATH.
-RUN chmod +x cosign \
+    && rm -rf tuf.db \
+    # make cosign exucatble and move to binary PATH.
+    && chmod +x cosign \
     && mv cosign /usr/bin/cosign
 
 # Python Requirements from (https://devguide.python.org/getting-started/setup-building/#install-dependencies)
@@ -139,10 +138,9 @@ RUN mkdir -p ${HOME}/opt
 WORKDIR ${HOME}/opt 
 
 RUN curl -o Python-${PYTHON_VERSION}.tar.xz.sigstore -L "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz.sigstore" \
-    && curl -o Python-${PYTHON_VERSION}.tar.xz -L "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz" 
-
-# Verifiy Python is secure.
-RUN cosign verify-blob Python-${PYTHON_VERSION}.tar.xz \
+    && curl -o Python-${PYTHON_VERSION}.tar.xz -L "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz" \
+    # Verifiy Python is secure.
+    && cosign verify-blob Python-${PYTHON_VERSION}.tar.xz \
         --bundle Python-${PYTHON_VERSION}.tar.xz.sigstore \
         --cert-identity lukasz@langa.pl \
         --cert-oidc-issuer "https://github.com/login/oauth" \
@@ -164,7 +162,6 @@ WORKDIR $HOME/opt/Python-${PYTHON_VERSION}
 RUN ./configure --enable-shared --enable-optimizations --with-lto --prefix=/usr/local LDFLAGS="-Wl,--rpath=/usr/local/lib" \
     # Install Python
     && make install --jobs $(nproc)
-
 
 # Napari Requirements
 RUN apt-get -y update && apt-get  install -y --no-install-recommends \
