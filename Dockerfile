@@ -33,7 +33,7 @@ ARG LIBNCURSES_DEV_VERSION="6.4+20240113-1ubuntu2" # https://packages.ubuntu.com
 # libreadline6-dev is a virtual package so no VERSION is provided however it is from libreadline-dev so this is specified instead
 # see https://packages.ubuntu.com/noble/libreadline6-dev
 ARG LIBREADLINE_DEV_VERSION="8.2-4build1" # https://packages.ubuntu.com/noble/libreadline-dev
-ARG LIBSQLITE3_DEV_VERSION="3.45.1-1ubuntu2.3" https://packages.ubuntu.com/noble/libsqlite3-dev
+ARG LIBSQLITE3_DEV_VERSION="3.45.1-1ubuntu2.4" https://packages.ubuntu.com/noble/libsqlite3-dev
 ARG LIBSSL_DEV_VERSION="3.0.13-0ubuntu3.5" https://packages.ubuntu.com/noble/libssl-dev
 ARG LZMA_VERSION="9.22-2.2" # https://packages.ubuntu.com/noble/lzma
 ARG LZMA_DEV_VERSION="9.22-2.2" # https://packages.ubuntu.com/noble/lzma-dev
@@ -41,7 +41,7 @@ ARG TK_DEV_VERSION="8.6.14build1" # https://packages.ubuntu.com/noble/tk-dev
 ARG LZMA_VERSION="9.22-2.2" # https://packages.ubuntu.com/noble/lzma
 ARG LIBBZ2_DEV_VERSION="1.0.8-5.1build0.1" # https://packages.ubuntu.com/noble/libbz2-dev # After testing required to add build0.1
 ARG TK_DEV_VERSION="8.6.14build1" # https://packages.ubuntu.com/noble/tk-dev
-ARG UUID_DEV_VERSION="2.39.3-9ubuntu6.2" # https://packages.ubuntu.com/noble-updates/uuid-dev
+ARG UUID_DEV_VERSION="2.39.3-9ubuntu6.3" # https://packages.ubuntu.com/noble-updates/uuid-dev
 ARG ZLIB1G_DEV_VERSION="1:1.3.dfsg-3.1ubuntu2.1" # https://packages.ubuntu.com/noble-updates/zlib1g-dev
 ARG LIBZSTD_DEV_VERSION="1.5.5+dfsg2-2build1.1" # https://packages.ubuntu.com/noble-updates/libzstd-dev
 
@@ -57,7 +57,7 @@ ARG MESA_UTILS_VERSION="9.0.0-2" # https://packages.ubuntu.com/noble/mesa-utils
 ARG X11_UTILS_VERSION="7.7+6build2" # https://packages.ubuntu.com/noble/x11-utils
 ARG LIBOPENGL0_VERSION="1.7.0-1build1" # https://packages.ubuntu.com/noble/libopengl0
 ARG LIBGL1_VERSION="1.7.0-1build1" # https://packages.ubuntu.com/noble/libgl1
-ARG LIBGLX_MESA0_VERSION="24.2.8-1ubuntu1~24.04.1" # https://packages.ubuntu.com/noble-updates/libglx-mesa0
+ARG LIBGLX_MESA0_VERSION="25.0.7-0ubuntu0.24.04.1" # https://packages.ubuntu.com/noble-updates/libglx-mesa0
 ARG LIBGLIB2_0_0T64_VERSION="2.80.0-6ubuntu3.4" # https://packages.ubuntu.com/noble/libglib2.0-0t64
 ARG LIBFONTCONFIG1_VERSION="2.15.0-1.1ubuntu2" # https://packages.ubuntu.com/noble/libfontconfig1
 ARG LIBXRENDER1_VERSION="1:0.9.10-1.1build1" # https://packages.ubuntu.com/noble/libxrender1
@@ -154,8 +154,7 @@ RUN rm /usr/bin/cosign  \
     && rm Python-${PYTHON_VERSION}.tar.xz.sigstore \ 
     && apt-get purge -y --auto-remove  \
         golang-go \
-        curl \
-        ca-certificates 
+        curl
 
 WORKDIR $HOME/opt/Python-${PYTHON_VERSION}
 # Configure Python
