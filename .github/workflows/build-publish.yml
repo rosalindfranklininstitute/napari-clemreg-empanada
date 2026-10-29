@@ -1,0 +1,108 @@
+name: Build napari (clemreg, empanada) container images and publish to Quay.io
+
+on:
+  workflow_dispatch:
+    inputs:
+      napari_version:
+        description: napari release (e.g. 0.4.19.post1)
+        type: string
+        required: true
+        default: '0.4.19.post1'
+      clemreg_version:
+        description: napari-clemreg release (e.g. 0.2.1)
+        type: string
+        required: true
+        default: '0.2.1'
+      empanada_version:
+        description: empanada-napari release (e.g. 1.1.0)
+        type: string
+        required: true
+        default: '1.1.0'
+      virtualgl_version:
+        description: VirtualGL release for -vgl tag (e.g. 3.1.5)
+        type: string
+        default: '3.1.5'
+      latest:
+        description: Set latest and latest-vgl tags
+        type: boolean
+        default: false
+
+env:
+  IMAGE: quay.io/rosalindfranklininstitute/napari-clemreg-empanada
+
+jobs:
+  build-container:
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Get build timestamp and image version
+        id: meta
+        env:
+          NAPARI: ${{ inputs.napari_version }}
+          CLEMREG: ${{ inputs.clemreg_version }}
+          EMPANADA: ${{ inputs.empanada_version }}
+        run: |
+          echo "created=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
+          echo "version=${NAPARI}-${CLEMREG}-${EMPANADA}" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to Quay.io
+        uses: docker/login-action@v4
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
+
+      - uses: docker/setup-buildx-action@v4
+
+      - uses: sigstore/cosign-installer@v4.1.0
+
+      - name: Build and push napari image
+        id: build
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          provenance: true
+          sbom: true
+          tags: |
+            ${{ env.IMAGE }}:${{ steps.meta.outputs.version }}
+            ${{ inputs.latest && format('{0}:latest', env.IMAGE) || '' }}
+          build-args: |
+            NAPARI_VERSION=${{ inputs.napari_version }}
+            CLEMREG_VERSION=${{ inputs.clemreg_version }}
+            EMPANADA_VERSION=${{ inputs.empanada_version }}
+            IMAGE_VERSION=${{ steps.meta.outputs.version }}
+            IMAGE_REVISION=${{ github.sha }}
+            IMAGE_CREATED=${{ steps.meta.outputs.created }}
+
+      - name: Build and push napari+VirtualGL image
+        id: build-vgl
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: Dockerfile-vgl
+          push: true
+          provenance: true
+          sbom: true
+          tags: |
+            ${{ env.IMAGE }}:${{ steps.meta.outputs.version }}-vgl
+            ${{ inputs.latest && format('{0}:latest-vgl', env.IMAGE) || '' }}
+          build-args: |
+            BASE_IMAGE=${{ env.IMAGE }}@${{ steps.build.outputs.digest }}
+            VIRTUALGL_VERSION=${{ inputs.virtualgl_version }}
+            IMAGE_VERSION=${{ steps.meta.outputs.version }}-vgl
+            IMAGE_REVISION=${{ github.sha }}
+            IMAGE_CREATED=${{ steps.meta.outputs.created }}
+
+      - name: Sign images
+        env:
+          DIGEST_NAPARI: ${{ steps.build.outputs.digest }}
+          DIGEST_VGL: ${{ steps.build-vgl.outputs.digest }}
+        run: |
+          cosign sign --yes "${IMAGE}@${DIGEST_NAPARI}"
+          cosign sign --yes "${IMAGE}@${DIGEST_VGL}"
