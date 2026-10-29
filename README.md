@@ -56,7 +56,7 @@ cosign verify quay.io/rosalindfranklininstitute/napari-clemreg-empanada:<tag> \
 ## Licences
 
 The files in this repository (Dockerfiles, workflow and documentation) are
-licensed under an Apache-2.0 license whilst there components have the licensing:
+licensed under an Apache-2.0 license whilst for the software components:
 
 | Software | Licence |
 |---|---|
