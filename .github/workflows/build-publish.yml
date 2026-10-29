@@ -4,22 +4,22 @@ on:
   workflow_dispatch:
     inputs:
       napari_version:
-        description: napari release (e.g. 0.4.19.post1)
+        description: napari version (e.g. 0.4.19.post1)
         type: string
         required: true
         default: '0.4.19.post1'
       clemreg_version:
-        description: napari-clemreg release (e.g. 0.2.1)
+        description: napari-clemreg version (e.g. 0.2.1)
         type: string
         required: true
         default: '0.2.1'
       empanada_version:
-        description: empanada-napari release (e.g. 1.1.0)
+        description: empanada-napari version (e.g. 1.1.0)
         type: string
         required: true
         default: '1.1.0'
       virtualgl_version:
-        description: VirtualGL release for -vgl tag (e.g. 3.1.5)
+        description: VirtualGL version for -vgl tag (e.g. 3.1.5)
         type: string
         default: '3.1.5'
       latest:
