@@ -1,0 +1,28 @@
+ARG BASE_IMAGE=napari-test
+FROM ${BASE_IMAGE}
+
+ARG BASE_IMAGE
+ARG VIRTUALGL_VERSION=3.1.5
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends wget \
+    && wget -q "https://github.com/VirtualGL/virtualgl/releases/download/${VIRTUALGL_VERSION}/virtualgl_${VIRTUALGL_VERSION}_amd64.deb" -P /tmp \
+    && apt-get install -y --no-install-recommends "/tmp/virtualgl_${VIRTUALGL_VERSION}_amd64.deb" \
+    && rm "/tmp/virtualgl_${VIRTUALGL_VERSION}_amd64.deb" \
+    && apt-get purge -y wget \
+    && apt-get autoremove -y \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+ARG IMAGE_VERSION="dev-vgl"
+ARG IMAGE_REVISION=""
+ARG IMAGE_CREATED=""
+
+# TODO: confirm the SPDX id for VirtualGL against its LICENSE file (LGPL-2.1-only vs LGPL-2.1-or-later)
+LABEL org.opencontainers.image.description="Ubuntu container with napari, napari-clemreg, empanada-napari and VirtualGL" \
+      org.opencontainers.image.licenses="Apache-2.0 AND BSD-3-Clause AND MIT AND LGPL-2.1-only" \
+      org.opencontainers.image.base.name="${BASE_IMAGE}" \
+      org.opencontainers.image.version="${IMAGE_VERSION}" \
+      org.opencontainers.image.revision="${IMAGE_REVISION}" \
+      org.opencontainers.image.created="${IMAGE_CREATED}" \
+      uk.ac.rfi.virtualgl.version="${VIRTUALGL_VERSION}"
